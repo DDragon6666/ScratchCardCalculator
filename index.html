@@ -1,17 +1,509 @@
-<style>
-    html, body {
-        margin: 0;
-        padding: 0;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scratch card calculator</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0;
+        }
+        .container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        table {
+            border-collapse: collapse;
+            position: relative;
+            z-index: 1;
+        }
+        td {
+            width: 100px;
+            height: 100px;
+            border: 2px solid #333;
+            text-align: center;
+            font-size: 24px;
+        }
+        input {
+            width: 90%;
+            height: 90%;
+            border: none;
+            font-size: 24px;
+            text-align: center;
+        }
+        .circle {
+            position: absolute;
+            width: 80px;    /* Doubled the size */
+            height: 80px;   /* Doubled the size */
+            border-radius: 50%;
+            background-color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 16px;
+            font-weight: bold;
+            z-index: 0;
+        }
+
+
+        /* Positioning the circles - assuming they surround the grid */
+        .circle1 { top: -92px; left: -92px; }
+        .circle2 { top: -92px; left: 12px; }
+        .circle3 { top: -92px; left: 116px; }
+        .circle4 { top: -92px; left: 220px; }
+        .circle5 { top: -92px; left: 334px; }
+        .circle6 { top: 12px; left: 334px; }
+        .circle7 { top: 116px; left: 334px; }
+        .circle8 { top: 220px; left: 334px; }
+
+        /* Style for buttons */
+        .button-container {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <table>
+            <tbody>
+            <tr>
+                <td><input type="text" maxlength="1" data-x="0" data-y="0"></td>
+                <td><input type="text" maxlength="1" data-x="1" data-y="0"></td>
+                <td><input type="text" maxlength="1" data-x="2" data-y="0"></td>
+            </tr>
+            <tr>
+                <td><input type="text" maxlength="1" data-x="0" data-y="1"></td>
+                <td><input type="text" maxlength="1" data-x="1" data-y="1"></td>
+                <td><input type="text" maxlength="1" data-x="2" data-y="1"></td>
+            </tr>
+            <tr>
+                <td><input type="text" maxlength="1" data-x="0" data-y="2"></td>
+                <td><input type="text" maxlength="1" data-x="1" data-y="2"></td>
+                <td><input type="text" maxlength="1" data-x="2" data-y="2"></td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <!-- Circles -->
+    <div class="circle circle1"></div>
+    <div class="circle circle2"></div>
+    <div class="circle circle3"></div>
+    <div class="circle circle4"></div>
+    <div class="circle circle5"></div>
+    <div class="circle circle6"></div>
+    <div class="circle circle7"></div>
+    <div class="circle circle8"></div>
+    
+    <!-- Buttons -->
+    <div class="button-container">
+        <button id="resetButton">Reset</button>
+        <button id="calculateButton">Calculate</button>
+    </div>
+</div>
+
+<script type="text/javascript">
+    const grid = Array.from({ length: 3 }, () => Array(3).fill(0));
+
+    const linePositions = [
+        [[0, 0], [1, 1], [2, 2]],
+        [[0, 0], [0, 1], [0, 2]],
+        [[1, 0], [1, 1], [1, 2]],
+        [[2, 0], [2, 1], [2, 2]],
+        [[2, 0], [1, 1], [0, 2]],
+        [[0, 0], [1, 0], [2, 0]],
+        [[0, 1], [1, 1], [2, 1]],
+        [[0, 2], [1, 2], [2, 2]]
+    ];
+
+    const lineNames = [
+        'up left diagonal',
+        'v - left',
+        'v - middle',
+        'v - right',
+        'up right diagonal',
+        'h - top',
+        'h - middle',
+        'h - bottom'
+    ];
+
+    const squareNames = [
+        'top left',
+        'top',
+        'top right',
+        'left',
+        'middle',
+        'right',
+        'bottom left',
+        'bottom',
+        'bottom right'
+    ];
+
+    const rewards = {
+        6: 1680,
+        7: 84,
+        8: 630,
+        9: 280,
+        10: 42,
+        11: 34,
+        12: 180,
+        13: 120,
+        14: 53,
+        15: 105,
+        16: 53,
+        17: 144,
+        18: 48,
+        19: 202,
+        20: 105,
+        21: 51,
+        22: 420,
+        23: 840,
+        24: 1008
+    };
+
+    function rewardFunction(reward) {
+        // Placeholder for possible sqrt adjustment
+        return reward;
     }
 
-    #gameCanvas {
-        width: 100%;
-        height: 100%;
+    function reward(lineTuple) {
+        return rewardFunction(rewards[sum(lineTuple)]);
     }
-</style>
 
-<canvas id="gameCanvas" width="1366vw" height="768vh"></canvas>
-<script type="text/javascript" src="calculator.js"></script>
+    function unalteredReward(lineTuple) {
+        return rewards[sum(lineTuple)];
+    }
+
+    function sum(tuple) {
+        return tuple.reduce((acc, val) => acc + val, 0);
+    }
+
+    function gridToTuple(grid) {
+        return grid.map(row => [...row]); // Create a shallow copy of the grid
+    }
+
+    function getGridValue(grid, mode = "avg") {
+        const numbersUsed = [];
+        for (const row of grid) {
+            for (const number of row) {
+                if (!number) continue;
+                numbersUsed.push(number);
+            }
+        }
+
+        const unusedNumbers = Array.from({ length: 9 }, (_, i) => i + 1).filter(number => !numbersUsed.includes(number));
+
+        const optionScores = [];
+        for (let lineNumber = 0; lineNumber < linePositions.length; lineNumber++) {
+            let totalValue = 0;
+            let minValue = Infinity;
+            let possibilities = 0;
+            const lineValues = [
+                grid[linePositions[lineNumber][0][1]][linePositions[lineNumber][0][0]],
+                grid[linePositions[lineNumber][1][1]][linePositions[lineNumber][1][0]],
+                grid[linePositions[lineNumber][2][1]][linePositions[lineNumber][2][0]]
+            ];
+            const lineValuesCopy = [...lineValues];
+
+            for (const value1 of (lineValues[0] ? [lineValues[0]] : unusedNumbers)) {
+                lineValuesCopy[0] = value1;
+                for (const value2 of (lineValues[1] ? [lineValues[1]] : unusedNumbers)) {
+                    if (value2 === value1) continue;
+                    lineValuesCopy[1] = value2;
+                    for (const value3 of (lineValues[2] ? [lineValues[2]] : unusedNumbers)) {
+                        if (value3 === value1 || value3 === value2) continue;
+                        lineValuesCopy[2] = value3;
+
+                        possibilities++;
+                        const value = reward(lineValuesCopy);
+                        totalValue += value;
+                        minValue = Math.min(value, minValue);
+                    }
+                }
+            }
+
+            optionScores.push([totalValue / possibilities, minValue]);
+        }
+
+        if (mode.toLowerCase() === 'avg') {
+            optionScores.sort((a, b) => b[0] - a[0]);
+            return optionScores[0][0];
+        }
+        if (mode.toLowerCase() === 'min') {
+            optionScores.sort((a, b) => b[1] - a[1]);
+            return optionScores[0][1];
+        }
+    }
+
+    const cache = new Map();
+
+    function getBestMove(gridTuple, mode = 'avg', printAvg = false) {
+        const grid = gridTuple.map(row => [...row]); // Convert back to a mutable list for processing
+
+        const emptyPositions = [];
+        const usedNumbers = new Set();
+        
+        for (let x = 0; x < 3; x++) {
+            for (let y = 0; y < 3; y++) {
+                usedNumbers.add(grid[y][x]);
+                if (grid[y][x] === 0) {
+                    emptyPositions.push([x, y]);
+                }
+            }
+        }
+
+        if (emptyPositions.length <= 5) {
+            return [0, getGridValue(grid)];
+        }
+
+        const unusedNumbers = new Set(Array.from({ length: 9 }, (_, i) => i + 1).filter(num => !usedNumbers.has(num)));
+
+        let bestMove = [0, 0];
+        let bestMoveValue = 0;
+
+        for (const [x, y] of emptyPositions) {
+            let possibilities = 0;
+            let moveValue = 0;
+
+            for (const number of unusedNumbers) {
+                grid[y][x] = number;
+                const gridTupleed = gridToTuple(grid);
+                const key = JSON.stringify(gridTupleed);
+                let thisAvg;
+
+                if (cache.has(key)) {
+                    thisAvg = cache.get(key);
+                } else {
+                    const result = getBestMove(gridTupleed, mode);
+                    thisAvg = result[1];
+                    cache.set(key, thisAvg);
+                }
+
+                possibilities++;
+                moveValue += thisAvg;
+            }
+
+            grid[y][x] = 0; // Reset the grid after trying the move
+            if (possibilities === 0) continue;
+
+            const avg = moveValue / possibilities;
+            if (bestMoveValue < avg) {
+                bestMoveValue = avg;
+                bestMove = [x, y];
+            }
+            if (printAvg) {
+                console.log('X:', x, 'Y:', y, 'AVG:', avg);
+            }
+        }
+
+        return [bestMove, bestMoveValue];
+    }
+
+    function getGridLineValues(grid, mode = "avg") {
+        const numbersUsed = [];
+        for (const row of grid) {
+            for (const number of row) {
+                if (!number) continue;
+                numbersUsed.push(number);
+            }
+        }
+
+        const unusedNumbers = Array.from({ length: 9 }, (_, i) => i + 1).filter(number => !numbersUsed.includes(number));
+
+        const optionScores = [];
+        for (let lineNumber = 0; lineNumber < linePositions.length; lineNumber++) {
+            let totalValue = 0;
+            let minValue = Infinity;
+            let possibilities = 0;
+            const lineValues = [
+                grid[linePositions[lineNumber][0][1]][linePositions[lineNumber][0][0]],
+                grid[linePositions[lineNumber][1][1]][linePositions[lineNumber][1][0]],
+                grid[linePositions[lineNumber][2][1]][linePositions[lineNumber][2][0]]
+            ];
+            const lineValuesCopy = [...lineValues];
+
+            for (const value1 of (lineValues[0] ? [lineValues[0]] : unusedNumbers)) {
+                lineValuesCopy[0] = value1;
+                for (const value2 of (lineValues[1] ? [lineValues[1]] : unusedNumbers)) {
+                    if (value2 === value1) continue;
+                    lineValuesCopy[1] = value2;
+                    for (const value3 of (lineValues[2] ? [lineValues[2]] : unusedNumbers)) {
+                        if (value3 === value1 || value3 === value2) continue;
+                        lineValuesCopy[2] = value3;
+
+                        possibilities++;
+                        const value = reward(lineValuesCopy);
+                        totalValue += value;
+                        minValue = Math.min(value, minValue);
+                    }
+                }
+            }
+
+            optionScores.push([totalValue / possibilities, minValue]);
+        }
+
+        return optionScores;
+    }
+
+    // Function to update the grid based on input
+    function updateGrid() {
+        for (let x = 0; x < 3; x++){
+            for (let y = 0; y < 3; y++){
+                turnCellColour(x, y, "#ffffff")
+            }
+        }
+        for (let i = 0; i < 8; i++){
+            setCircleColor(i, "#ffffff");
+            setCircleText(i, "");
+        }
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(input => {
+            const x = parseInt(input.dataset.x);
+            const y = parseInt(input.dataset.y);
+            const value = input.value;
+
+            // Update the grid array
+            grid[y][x] = value === '' || value === '0' ? 0 : parseInt(value);
+        });
+        console.log(grid); // For debugging
+    }
+
+    // Reset the grid to all 0s
+    function resetGrid() {
+        for (let x = 0; x < 3; x++){
+            for (let y = 0; y < 3; y++){
+                turnCellColour(x, y, "#ffffff")
+            }
+        }
+        for (let i = 0; i < 8; i++){
+            setCircleColor(i, "#ffffff");
+            setCircleText(i, "");
+        }
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.value = '';  // Set all inputs to 0
+        });
+        grid.forEach(row => row.fill(0));  // Update the grid array to all 0s
+        console.log(grid);  // For debugging
+    }
+
+    // Calculate button handler (dummy function)
+    function on_calculate_click() {
+        console.log('Calculate button clicked! Performing calculation...');
+        // Add your calculation logic here
+        remaining_places_count = 0;
+        for (let x = 0; x < 3; x++){
+            for (let y = 0; y < 3; y++){
+                if (grid[y][x] !== 0){
+                    remaining_places_count++;
+                }
+            }
+        }
+        // if remaining pieces is less than 4 then get the best place to scratch and highlight it pale pink
+        console.log(remaining_places_count);
+        if (remaining_places_count < 4){
+            console.log("get best place to reveal");
+            result = getBestMove(grid, "avg", false);
+            let x = result[0][0];
+            let y = result[0][1];
+            let avg = result[1];
+            console.log(result);
+            turnCellColour(x, y, "#ff9999");
+        }
+        else{
+            console.log("get the best line to go with");
+            result = getGridLineValues(grid, "avg");
+            console.log(result);
+            for (let i = 0; i < 8; i++){
+                let lineText = "AVG: "+result[i][0]+"\nMIN: "+result[i][1];
+                setCircleText(i, lineText);
+            }
+            let bestAVG = 0;
+            let bestAVGIndex = 0;
+            let bestMIN = 0;
+            let bestMINIndex = 0;
+            for (let i = 0; i < 8; i++){
+                if (bestAVG < result[i][0]){
+                    bestAVG = result[i][0];
+                    bestAVGIndex = i;
+                }
+                if (bestMIN < result[i][1]){
+                    bestMIN = result[i][1];
+                    bestMINIndex = i;
+                }
+            }
+            if (bestMINIndex === bestAVGIndex){
+                setCircleColor(bestMINIndex, "#eb8f34");
+            }
+            else{
+                setCircleColor(bestAVGIndex, "#ebc634");
+                setCircleColor(bestMINIndex, "#80eb34");
+            }
+        }
+    }
+
+    function turnCellColour(x, y, colour) {
+        console.log(x, y);
+        const cell = document.querySelector(`input[data-x="${x}"][data-y="${y}"]`);
+        if (cell) {
+            cell.style.backgroundColor = colour; // Change the background color to red
+        }
+    }
+
+    function setCircleText(circleIndex, text) {
+        const circle = document.querySelector(`.circle${circleIndex+1}`);
+        if (circle) {
+            circle.textContent = text;
+        }
+    }
+
+    // Function to set color of the circles
+    function setCircleColor(circleIndex, color) {
+        const circle = document.querySelector(`.circle${circleIndex+1}`);
+        if (circle) {
+            circle.style.backgroundColor = color;
+        }
+    }
+
+    // Add event listeners to inputs
+    const inputs = document.querySelectorAll('input');
+    inputs.forEach(input => {
+        input.addEventListener('input', updateGrid);
+        input.addEventListener('keydown', function(event) {
+            if (event.key === 'Backspace' || event.key === '0') {
+                this.value = ''; // Clear the input
+                updateGrid(); // Update the grid
+            }
+        });
+    });
+
+    // Add event listeners to buttons
+    document.getElementById('resetButton').addEventListener('click', resetGrid);
+    document.getElementById('calculateButton').addEventListener('click', on_calculate_click);
+</script>
+
+</body>
+</html>
