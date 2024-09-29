@@ -64,6 +64,8 @@
         .circle6 { top: 12px; left: 334px; }
         .circle7 { top: 116px; left: 334px; }
         .circle8 { top: 220px; left: 334px; }
+        .circleAVG { top: 40px; left: 30px; }
+        .circleMIN { top: 140px; left: 30px; }
 
         /* Style for buttons */
         .button-container {
@@ -87,41 +89,45 @@
 </head>
 <body>
 
-    <div class="container">
-        <table>
-            <tbody>
-            <tr>
-                <td><input type="text" maxlength="1" data-x="0" data-y="0"></td>
-                <td><input type="text" maxlength="1" data-x="1" data-y="0"></td>
-                <td><input type="text" maxlength="1" data-x="2" data-y="0"></td>
-            </tr>
-            <tr>
-                <td><input type="text" maxlength="1" data-x="0" data-y="1"></td>
-                <td><input type="text" maxlength="1" data-x="1" data-y="1"></td>
-                <td><input type="text" maxlength="1" data-x="2" data-y="1"></td>
-            </tr>
-            <tr>
-                <td><input type="text" maxlength="1" data-x="0" data-y="2"></td>
-                <td><input type="text" maxlength="1" data-x="1" data-y="2"></td>
-                <td><input type="text" maxlength="1" data-x="2" data-y="2"></td>
-            </tr>
-        </tbody>
-    </table>
-    
-    <!-- Circles -->
-    <div class="circle circle1"></div>
-    <div class="circle circle2"></div>
-    <div class="circle circle3"></div>
-    <div class="circle circle4"></div>
-    <div class="circle circle5"></div>
-    <div class="circle circle6"></div>
-    <div class="circle circle7"></div>
-    <div class="circle circle8"></div>
-    
-    <!-- Buttons -->
-    <div class="button-container">
-        <button id="resetButton">Reset</button>
-        <button id="calculateButton">Calculate</button>
+    <div>
+        <div class="circle circleAVG"></div>
+        <div class="circle circleMIN"></div>
+        <div class="container">
+            <table>
+                <tbody>
+                <tr>
+                    <td><input type="text" maxlength="1" data-x="0" data-y="0"></td>
+                    <td><input type="text" maxlength="1" data-x="1" data-y="0"></td>
+                    <td><input type="text" maxlength="1" data-x="2" data-y="0"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" maxlength="1" data-x="0" data-y="1"></td>
+                    <td><input type="text" maxlength="1" data-x="1" data-y="1"></td>
+                    <td><input type="text" maxlength="1" data-x="2" data-y="1"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" maxlength="1" data-x="0" data-y="2"></td>
+                    <td><input type="text" maxlength="1" data-x="1" data-y="2"></td>
+                    <td><input type="text" maxlength="1" data-x="2" data-y="2"></td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <!-- Circles -->
+        <div class="circle circle1"></div>
+        <div class="circle circle2"></div>
+        <div class="circle circle3"></div>
+        <div class="circle circle4"></div>
+        <div class="circle circle5"></div>
+        <div class="circle circle6"></div>
+        <div class="circle circle7"></div>
+        <div class="circle circle8"></div>
+        
+        <!-- Buttons -->
+        <div class="button-container">
+            <button id="resetButton">Reset</button>
+            <button id="calculateButton">Calculate</button>
+        </div>
     </div>
 </div>
 
@@ -376,8 +382,8 @@
             }
         }
         for (let i = 0; i < 8; i++){
-            setCircleColor(i, "#ffffff");
-            setCircleText(i, "");
+            setCircleColor(i+1, "#ffffff");
+            setCircleText(i+1, "");
         }
         const inputs = document.querySelectorAll('input');
         inputs.forEach(input => {
@@ -399,8 +405,8 @@
             }
         }
         for (let i = 0; i < 8; i++){
-            setCircleColor(i, "#ffffff");
-            setCircleText(i, "");
+            setCircleColor(i+1, "#ffffff");
+            setCircleText(i+1, "");
         }
         const inputs = document.querySelectorAll('input');
         inputs.forEach(input => {
@@ -439,7 +445,7 @@
             console.log(result);
             for (let i = 0; i < 8; i++){
                 let lineText = "AVG: "+result[i][0]+"\nMIN: "+result[i][1];
-                setCircleText(i, lineText);
+                setCircleText(i+1, lineText);
             }
             let bestAVG = 0;
             let bestAVGIndex = 0;
@@ -456,11 +462,11 @@
                 }
             }
             if (bestMINIndex === bestAVGIndex){
-                setCircleColor(bestMINIndex, "#00ff40");
+                setCircleColor(bestMINIndex+1, "#2ff53c");
             }
             else{
-                setCircleColor(bestAVGIndex, "#2ff53c");
-                setCircleColor(bestMINIndex, "#4dbefa");
+                setCircleColor(bestAVGIndex+1, "#2ff53c");
+                setCircleColor(bestMINIndex+1, "#4dbefa");
             }
         }
     }
@@ -474,7 +480,7 @@
     }
 
     function setCircleText(circleIndex, text) {
-        const circle = document.querySelector(`.circle${circleIndex+1}`);
+        const circle = document.querySelector(`.circle${circleIndex}`);
         if (circle) {
             circle.textContent = text;
         }
@@ -482,7 +488,7 @@
 
     // Function to set color of the circles
     function setCircleColor(circleIndex, color) {
-        const circle = document.querySelector(`.circle${circleIndex+1}`);
+        const circle = document.querySelector(`.circle${circleIndex}`);
         if (circle) {
             circle.style.backgroundColor = color;
         }
@@ -503,6 +509,10 @@
     // Add event listeners to buttons
     document.getElementById('resetButton').addEventListener('click', resetGrid);
     document.getElementById('calculateButton').addEventListener('click', on_calculate_click);
+    setCircleColor("AVG", "#00ff40");
+    setCircleColor("MIN", "#4dbefa");
+    setCircleText("AVG", "Average");
+    setCircleText("MIN", "Minimum");
 </script>
 
 </body>
