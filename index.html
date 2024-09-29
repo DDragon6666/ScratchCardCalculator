@@ -13,7 +13,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: #12111a;
+            background-color: "#12111a";
         }
         .container {
             position: relative;
@@ -431,7 +431,7 @@
             let y = result[0][1];
             let avg = result[1];
             console.log(result);
-            turnCellColour(x, y, "#ff9999");
+            turnCellColour(x, y, "#2ff53c");
         }
         else{
             console.log("get the best line to go with");
@@ -456,11 +456,11 @@
                 }
             }
             if (bestMINIndex === bestAVGIndex){
-                setCircleColor(bestMINIndex, "#eb8f34");
+                setCircleColor(bestMINIndex, "#00ff40");
             }
             else{
-                setCircleColor(bestAVGIndex, "#ebc634");
-                setCircleColor(bestMINIndex, "#80eb34");
+                setCircleColor(bestAVGIndex, "#2ff53c");
+                setCircleColor(bestMINIndex, "#4dbefa");
             }
         }
     }
